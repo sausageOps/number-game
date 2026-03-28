@@ -33,6 +33,13 @@ BLUE = (0, 128, 255)
 RED = (255, 0, 0)
 GREEN = (0, 150, 0)
 
+# Watermark
+watermark_font = pygame.font.Font(None, 20)
+
+def draw_watermark():
+    text = watermark_font.render("Built by sausageOps", True, (150, 150, 150))
+    screen.blit(text, (WIDTH - 180, HEIGHT - 20))
+
 # Game variables
 state = "menu"
 max_num = 100
@@ -147,6 +154,7 @@ while running:
 
         screen.blit(font.render("Play Again", True, WHITE), (220, 235))
 
+    draw_watermark()
     pygame.display.update()
 
 pygame.quit()
