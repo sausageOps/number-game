@@ -1,47 +1,101 @@
+import pygame
+import sys
 import random
 
-print("=" * 30)
-print("🎮 Number Guessing Game")
-print("=" * 30)
+pygame.init()
 
-while True:
-    choice = input("Choose difficulty (easy / medium / hard): ").lower()
+WIDTH, HEIGHT = 600, 400
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Number Guessing Game 🎮")
 
-    if choice == "easy":
-        max_num = 50
-    elif choice == "medium":
-        max_num = 100
-    else:
-        max_num = 200
+font = pygame.font.Font(None, 36)
 
-    number = random.randint(1, max_num)
-    max_attempts = 7
-    attempts = 0
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 128, 255)
 
-    while attempts < max_attempts:
-        try:
-            guess = int(input(f"Enter your guess (1-{max_num}): "))
-            attempts += 1
+state = "menu"
+max_num = 100
+number = 0
+input_text = ""
 
-            if guess == number:
-                print(f"🎉 You guessed it in {attempts} attempts!")
-                break
+running = True
 
-            elif guess < number:
-                print("Too low 🔻")
-            else:
-                print("Too high 🔺")
+while running:
+    screen.fill(WHITE)
 
-            if abs(number - guess) <= 5:
-                print("🔥 Very close!")
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-        except ValueError:
-            print("Please enter a valid number!")
+        if state == "menu":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if easy_btn.collidepoint(event.pos):
+                    max_num = 50
+                    number = random.randint(1, max_num)
+                    state = "game"
 
-    else:
-        print(f"💀 Game Over! The number was {number}")
+                if medium_btn.collidepoint(event.pos):
+                    max_num = 100
+                    number = random.randint(1, max_num)
+                    state = "game"
 
-    again = input("Play again? (y/n): ")
-    if again != "y":
-        print("Thanks for playing!")
-        break
+                if hard_btn.collidepoint(event.pos):
+                    max_num = 200
+                    number = random.randint(1, max_num)
+                    state = "game"
+
+        elif state == "game":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    try:
+                        guess = int(input_text)
+                        if guess == number:
+                            state = "win"
+                        elif guess < number:
+                            result = "Too Low"
+                        else:
+                            result = "Too High"
+                    except:
+                        result = "Invalid input"
+                    input_text = ""
+                elif event.key == pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]
+                else:
+                    input_text += event.unicode
+
+    # ===== DRAW MENU =====
+    if state == "menu":
+        title = font.render("Select Difficulty", True, BLACK)
+        screen.blit(title, (180, 50))
+
+        easy_btn = pygame.Rect(200, 120, 200, 40)
+        medium_btn = pygame.Rect(200, 180, 200, 40)
+        hard_btn = pygame.Rect(200, 240, 200, 40)
+
+        pygame.draw.rect(screen, BLUE, easy_btn)
+        pygame.draw.rect(screen, BLUE, medium_btn)
+        pygame.draw.rect(screen, BLUE, hard_btn)
+
+        screen.blit(font.render("Easy", True, WHITE), (270, 130))
+        screen.blit(font.render("Medium", True, WHITE), (250, 190))
+        screen.blit(font.render("Hard", True, WHITE), (270, 250))
+
+    # ===== GAME SCREEN =====
+    elif state == "game":
+        prompt = font.render(f"Guess (1-{max_num}): {input_text}", True, BLACK)
+        screen.blit(prompt, (100, 150))
+
+        if 'result' in locals():
+            res_text = font.render(result, True, BLACK)
+            screen.blit(res_text, (250, 200))
+
+    # ===== WIN SCREEN =====
+    elif state == "win":
+        win_text = font.render("🎉 You Won!", True, BLACK)
+        screen.blit(win_text, (220, 150))
+
+    pygame.display.update()
+
+pygame.quit()
+sys.exit()
