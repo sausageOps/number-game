@@ -1,3 +1,12 @@
+import os
+import sys
+
+def resource_path(relative_path):
+    import os, sys
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 import pygame
 import sys
 import random
@@ -6,8 +15,8 @@ pygame.init()
 pygame.mixer.init()
 
 # Load sounds
-click_sound = pygame.mixer.Sound("click.wav")
-win_sound = pygame.mixer.Sound("win.wav")
+click_sound = pygame.mixer.Sound(resource_path("click.wav"))
+win_sound = pygame.mixer.Sound(resource_path("win.wav"))
 
 # Window
 WIDTH, HEIGHT = 600, 400
